@@ -84,7 +84,7 @@ public class ShotGun : MonoBehaviour
         Vector2 direction = (mousePos - transform.position).normalized;
 
         // プレイヤーに反動を加える（発射方向とは逆）
-        playerRb.AddForce(direction * recoilForce, ForceMode2D.Impulse);
+        playerRb.AddForce(direction.normalized * recoilForce, ForceMode2D.Impulse);
 
         // 発射時のロジック（例えば、弾丸生成など）はここに追加可能
     }
