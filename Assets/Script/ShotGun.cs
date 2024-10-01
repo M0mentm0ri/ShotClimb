@@ -2,50 +2,50 @@ using UnityEngine;
 
 public class ShotGun : MonoBehaviour
 {
-    // プレイヤーのRigidbody2D
     private Rigidbody2D playerRb;
-
-    // 武器（プレイヤーの子オブジェクト）への参照
     public Transform weaponTransform;
-
-    // 反動の力
     public float recoilForce = 5f;
-
-    // 発射のクールダウンタイム
     public float shotCooldown = 0.5f;
-
-    // 内部クールダウンタイマー
     private float cooldownTimer = 0f;
-
-    // パーティクルシステム（ショットガンの発射エフェクト）
     public ParticleSystem shotEffect;
 
-    // 残弾数の変数
-    public int maxAmmo = 5; // 最大弾数
-    private int currentAmmo; // 現在の弾数
-
-    // 弾薬表示用のオブジェクト
-    public GameObject[] ammoDisplayObjects; // 弾薬を表示するためのオブジェクト
+    public int maxAmmo = 5;
+    private int currentAmmo;
+    public float stopReloadTime = 2f; // リロードまでの停止時間
+    private float stopTimer = 0f; // 停止時間を計測するタイマー
+    public GameObject[] ammoDisplayObjects; // 弾薬表示用オブジェクト
+    public float reloadTime = 2f; // リロード間隔
+    private float reloadTimer = 0f; // リロード用のタイマー
+    public bool isGrounded = false; // 地面に接触しているかどうか
 
     void Start()
     {
-        // Rigidbody2D コンポーネントを取得
         playerRb = GetComponent<Rigidbody2D>();
-
-        // 残弾数を初期化
         currentAmmo = maxAmmo;
-
-        // 残弾数の表示を初期化
         UpdateAmmoDisplay();
     }
 
     void Update()
     {
-        // 常に武器の方向をマウスに向ける
         AimWeapon();
-
-        // クールダウンのタイマーを更新
         cooldownTimer -= Time.deltaTime;
+
+        float speed = playerRb.velocity.magnitude;
+
+        // リロードタイマーを更新（地面に接触している場合のみ）
+        if (isGrounded || speed <= 0.1f) // プレイヤーが停止している場合
+        {
+            reloadTimer += Time.deltaTime; // リロードタイマーを進める
+            if (reloadTimer >= reloadTime)
+            {
+                ReloadAmmo();
+                reloadTimer = 0f; // リロード後、タイマーをリセット
+            }
+        }
+        else
+        {
+            reloadTimer = 0f; // プレイヤーが動いている場合、タイマーをリセット
+        }
 
         // 弾があるか確認して、発射可能かチェック
         if (Input.GetMouseButtonDown(0) && cooldownTimer <= 0f && currentAmmo > 0)
@@ -64,69 +64,59 @@ public class ShotGun : MonoBehaviour
         }
     }
 
-    // マウスの方向に武器を向ける
+    private void ReloadAmmo()
+    {
+        if (currentAmmo < maxAmmo)
+        {
+            currentAmmo++; // 残弾数を1発増やす
+            UpdateAmmoDisplay(); // 残弾数表示を更新
+        }
+    }
+
     void AimWeapon()
     {
-        // マウス位置を取得し、プレイヤーからの方向を計算
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePos - transform.position).normalized;
-
-        // 子オブジェクト（武器）の方向を設定（常にマウスを向く）
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         weaponTransform.rotation = Quaternion.Euler(0, 0, angle);
     }
 
-    // 発射後に反動を加える
     void ApplyRecoil()
     {
-        // マウス位置を取得し、プレイヤーからの方向を計算
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePos - transform.position).normalized;
-
-        // プレイヤーに反動を加える（発射方向とは逆）
-        playerRb.AddForce(direction.normalized * recoilForce, ForceMode2D.Impulse);
-
-        // 発射時のロジック（例えば、弾丸生成など）はここに追加可能
+        playerRb.AddForce(direction.normalized * recoilForce, ForceMode2D.Impulse); // ここはそのままの方向に力を加える
     }
 
-    // パーティクルエフェクトを再生する
     void PlayShotEffect()
     {
-        // パーティクルシステムが設定されている場合のみ再生
         if (shotEffect != null)
         {
             shotEffect.Play();
         }
     }
 
-    // 残弾数の表示を更新する
     void UpdateAmmoDisplay()
     {
-        // ammoDisplayObjects の長さと maxAmmo が一致していることが前提
         for (int i = 0; i < ammoDisplayObjects.Length; i++)
         {
-            // 残弾数がまだある場合は表示し、それ以外は非表示にする
-            if (i < currentAmmo)
-            {
-                ammoDisplayObjects[i].SetActive(true);
-            }
-            else
-            {
-                ammoDisplayObjects[i].SetActive(false);
-            }
+            ammoDisplayObjects[i].SetActive(i < currentAmmo);
         }
     }
 
-    // 弾薬をリロードする（特定のオブジェクトに触れた時に呼ばれる）
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Ground"))
         {
-            // 残弾数を最大にリロード
-            currentAmmo = maxAmmo;
+            isGrounded = true; // 地面に接触中
+        }
+    }
 
-            // 弾薬表示を更新
-            UpdateAmmoDisplay();
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Ground"))
+        {
+            isGrounded = false; // 地面から離れた
         }
     }
 }
