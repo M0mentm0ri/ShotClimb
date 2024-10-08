@@ -31,6 +31,12 @@ public class ShotGun : MonoBehaviour
     private LineRenderer pickupLineRenderer; // 旗回収範囲の表示用
     public int circleSegmentCount = 50; // 円を構成する頂点の数
 
+    [Header("Movement Settings")]
+    private float keyHoldTime = 0f;
+    public float maxHoldDuration = 1f; // 長押しの最大時間
+    public float movementForceMultiplier = 2f; // 長押しに応じた移動力の倍率
+
+
     void Start()
     {
         playerRb = GetComponent<Rigidbody2D>();
@@ -88,6 +94,60 @@ public class ShotGun : MonoBehaviour
             // 旗がない場合はLineRendererを無効化
             teleportLineRenderer.enabled = false;
             pickupLineRenderer.enabled = false;
+        }
+
+        HandleMovement();
+
+    }
+
+    void HandleMovement()
+    {
+        Vector2 moveDirection = Vector2.zero;
+
+        // 押されているキーに応じた移動方向を決定
+        if (Input.GetKey(KeyCode.A))
+        {
+            moveDirection = Vector2.left;
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            moveDirection = Vector2.right;
+        }
+
+        // 現在の速度を取得
+        float currentSpeed = playerRb.velocity.x;
+
+        // 飛行中か地上にいるかを判断
+        if (isGrounded)
+        {
+            // 地上にいる場合の動き
+            if (moveDirection != Vector2.zero)
+            {
+                // 押されている方向に一定の速度で移動
+                playerRb.velocity = new Vector2(moveDirection.x * movementForceMultiplier, playerRb.velocity.y);
+            }
+            else
+            {
+                // 動かないときは速度をゼロにする
+                playerRb.velocity = new Vector2(0, playerRb.velocity.y);
+            }
+        }
+        else
+        {
+            // 飛行中の動き
+            if (moveDirection != Vector2.zero)
+            {
+                // 同じ方向のキーを押すと一定の速度で飛び続ける
+                if (moveDirection.x == Mathf.Sign(currentSpeed))
+                {
+                    playerRb.velocity = new Vector2(moveDirection.x * movementForceMultiplier, playerRb.velocity.y);
+                }
+                // 逆方向のキーを押すと、飛行距離を一定の速度で減少させる
+                else
+                {
+                    playerRb.velocity = new Vector2(moveDirection.x * movementForceMultiplier, playerRb.velocity.y);
+                }
+            }
         }
     }
 
@@ -177,13 +237,13 @@ public class ShotGun : MonoBehaviour
         if (angle > 90 || angle < -90) // 左を向く角度範囲
         {
             weaponTransform.parent.rotation = Quaternion.Euler(0, 180, 0); // 左向きのためX軸を反転
-                                                                       // 武器の向きを更新
+                                                                           // 武器の向きを更新
             weaponTransform.rotation = Quaternion.Euler(0, 180, 180 - angle);
         }
         else
         {
             weaponTransform.parent.rotation = Quaternion.Euler(0, 0, 0); // 左向きのためX軸を反転
-                                                                      // 武器の向きを更新
+                                                                         // 武器の向きを更新
             weaponTransform.rotation = Quaternion.Euler(0, 0, angle);
         }
     }
