@@ -27,8 +27,20 @@ public class StageConfiner : MonoBehaviour
         if (other.CompareTag("Player")) // Playerタグを持つオブジェクト
         {
             UpdateCameraConfiner(); // カメラのConfinerを更新
+
+            // 接触したプレイヤーからリスポーンスクリプトを取得
+            Respawn respawnScript = other.GetComponent<Respawn>();
+
+            if (respawnScript != null)
+            {
+                // 自身のオブジェクトの座標をリスポーン位置に設定
+                Vector3 newRespawnPosition = transform.position; // 自身のオブジェクトの座標
+                respawnScript.SetRespawnPosition(newRespawnPosition);
+                Debug.Log("リスポーン位置を更新しました: " + newRespawnPosition);
+            }
         }
     }
+
 
     private void UpdateCameraConfiner()
     {
