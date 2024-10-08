@@ -11,13 +11,6 @@ public class PlayerController : MonoBehaviour
     public float bulletSpeed = 20f;  // 弾の速度
     public Camera mainCamera;  // マウスの位置を取得するためのカメラ
 
-    public LineRenderer lineRenderer; // LineRendererをInspectorで設定
-    public float maxGrappleDistance = 10f; // グラップルの最大距離
-    public float pullSpeed = 5f; // 引き寄せる速度
-    private Vector2 grappleTarget;
-    private bool isGrappling = false;
-    internal string ammo;
-
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -32,35 +25,10 @@ public class PlayerController : MonoBehaviour
         mousePos = mainCamera.ScreenToWorldPoint(mousePos);
         Vector2 targetPoint = new Vector2(mousePos.x, mousePos.y);
 
-        // 弾を発射
+        // 左クリックで弾を発射
         if (Input.GetMouseButtonDown(0) && currentAmmo > 0)
         {
             Shoot((targetPoint - (Vector2)muzzle.position).normalized);
-        }
-
-        // グラップルを発射または解除
-        if (Input.GetMouseButtonDown(1))
-        {
-            if (isGrappling)
-            {
-                ReleaseGrapple();
-            }
-            else
-            {
-                FireGrapple(targetPoint);
-            }
-        }
-
-        // 線を更新
-        if (isGrappling)
-        {
-            lineRenderer.SetPosition(0, transform.position);
-            lineRenderer.SetPosition(1, grappleTarget);
-            PullPlayer();
-        }
-        else
-        {
-            lineRenderer.SetPosition(1, transform.position); // グラップルしていない時はプレイヤーの位置を表示
         }
     }
 
@@ -82,47 +50,6 @@ public class PlayerController : MonoBehaviour
         {
             hit.collider.GetComponent<DestructibleObject>().TakeDamage(1);  // 障害物へのダメージ
         }
-    }
-
-    void FireGrapple(Vector2 targetPoint)
-    {
-        // グラップルを発射
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, (targetPoint - (Vector2)transform.position).normalized, maxGrappleDistance);
-
-        if (hit.collider != null)
-        {
-            // ターゲットに刺さった場合の処理
-            grappleTarget = hit.point;
-            lineRenderer.SetPosition(1, grappleTarget);
-            isGrappling = true; // グラップル中フラグを設定
-        }
-        else
-        {
-            lineRenderer.SetPosition(1, targetPoint);
-            isGrappling = false; // グラップル中フラグをリセット
-        }
-    }
-
-    void PullPlayer()
-    {
-        Vector2 playerPosition = transform.position;
-
-        // プレイヤーをターゲット位置に向かって引き寄せる
-        if (Vector2.Distance(playerPosition, grappleTarget) > 0.1f)
-        {
-            Vector2 newPosition = Vector2.MoveTowards(playerPosition, grappleTarget, pullSpeed * Time.deltaTime);
-            transform.position = newPosition;
-        }
-        else
-        {
-            ReleaseGrapple(); // 到達したらグラップルを終了
-        }
-    }
-
-    void ReleaseGrapple()
-    {
-        isGrappling = false; // グラップルを解除
-        lineRenderer.SetPosition(1, transform.position); // 線の終点をプレイヤーの位置に戻す
     }
 
     public void Reload(int ammoPickedUp)
