@@ -11,18 +11,35 @@ public class ShotGun : MonoBehaviour
 
     public int maxAmmo = 5;
     private int currentAmmo;
-    public float stopReloadTime = 2f; // リロードまでの停止時間
-    private float stopTimer = 0f; // 停止時間を計測するタイマー
-    public GameObject[] ammoDisplayObjects; // 弾薬表示用オブジェクト
-    public float reloadTime = 2f; // リロード間隔
-    private float reloadTimer = 0f; // リロード用のタイマー
-    public bool isGrounded = false; // 地面に接触しているかどうか
+    public float stopReloadTime = 2f;
+    private float stopTimer = 0f;
+    public GameObject[] ammoDisplayObjects;
+    public float reloadTime = 2f;
+    private float reloadTimer = 0f;
+    public bool isGrounded = false;
+
+    public GameObject flagPrefab; // 旗のプレハブ
+    private GameObject placedFlag; // 設置された旗
+    public Transform flagParent; // 旗を配置する親オブジェクト
+    public float teleportDistance = 10f; // テレポートする距離のしきい値
+    public float flagPickupRange = 2f; // 旗を回収する範囲
+    private bool hasFlag = true; // 手持ちに旗があるかどうか
+    public float holdTime = 1.5f; // 旗を回収するための長押し時間
+    private float holdTimer = 0f;
+
+    private LineRenderer teleportLineRenderer; // テレポート距離の表示用
+    private LineRenderer pickupLineRenderer; // 旗回収範囲の表示用
+    public int circleSegmentCount = 50; // 円を構成する頂点の数
 
     void Start()
     {
         playerRb = GetComponent<Rigidbody2D>();
         currentAmmo = maxAmmo;
         UpdateAmmoDisplay();
+
+        // LineRendererを作成
+        CreateLineRenderer(ref teleportLineRenderer, Color.red);
+        CreateLineRenderer(ref pickupLineRenderer, Color.green);
     }
 
     void Update()
@@ -32,35 +49,110 @@ public class ShotGun : MonoBehaviour
 
         float speed = playerRb.velocity.magnitude;
 
-        // リロードタイマーを更新（地面に接触している場合のみ）
-        if (isGrounded || speed <= 0.1f) // プレイヤーが停止している場合
+        // リロードタイマーを更新
+        if (isGrounded || speed <= 0.1f)
         {
-            reloadTimer += Time.deltaTime; // リロードタイマーを進める
+            reloadTimer += Time.deltaTime;
             if (reloadTimer >= reloadTime)
             {
                 ReloadAmmo();
-                reloadTimer = 0f; // リロード後、タイマーをリセット
+                reloadTimer = 0f;
             }
         }
         else
         {
-            reloadTimer = 0f; // プレイヤーが動いている場合、タイマーをリセット
+            reloadTimer = 0f;
         }
 
-        // 弾があるか確認して、発射可能かチェック
+        // 弾があるか確認して発射
         if (Input.GetMouseButtonDown(0) && cooldownTimer <= 0f && currentAmmo > 0)
         {
             ApplyRecoil();
-            PlayShotEffect(); // パーティクル再生
-            currentAmmo--; // 残弾数を減らす
-            UpdateAmmoDisplay(); // 残弾数表示を更新
-            cooldownTimer = shotCooldown; // クールダウンタイマーをリセット
+            PlayShotEffect();
+            currentAmmo--;
+            UpdateAmmoDisplay();
+            cooldownTimer = shotCooldown;
         }
 
-        // 弾薬が0の場合は発射できない
-        if (currentAmmo <= 0)
+        // 旗の設置、テレポート機能
+        HandleFlagActions();
+
+        // 旗が設置されている場合、範囲を描画
+        if (placedFlag != null)
         {
-            Debug.Log("残弾がありません。リロードしてください。");
+            DrawCircle(teleportLineRenderer, teleportDistance, placedFlag.transform.position);
+            DrawCircle(pickupLineRenderer, flagPickupRange, placedFlag.transform.position);
+        }
+        else
+        {
+            // 旗がない場合はLineRendererを無効化
+            teleportLineRenderer.enabled = false;
+            pickupLineRenderer.enabled = false;
+        }
+    }
+
+    private void HandleFlagActions()
+    {
+        if (placedFlag != null)
+        {
+            float distanceToFlag = Vector2.Distance(transform.position, placedFlag.transform.position);
+
+            // 旗の範囲外で自動的にテレポート
+            if ((distanceToFlag > teleportDistance) || ((Input.GetKey(KeyCode.R) && !(distanceToFlag <= flagPickupRange))))
+            {
+                TeleportToFlag();
+            }
+
+            // 旗の近くでRを長押しすると旗を回収
+            if (distanceToFlag <= flagPickupRange && Input.GetKey(KeyCode.R))
+            {
+                holdTimer += Time.deltaTime;
+
+                if (holdTimer >= holdTime)
+                {
+                    PickupFlag();
+                    holdTimer = 0f;
+                }
+            }
+            else
+            {
+                holdTimer = 0f;
+            }
+        }
+
+        // 旗が手持ちにある場合、設置可能
+        if (isGrounded && hasFlag && Input.GetKeyDown(KeyCode.R) && placedFlag == null)
+        {
+            PlaceFlag();
+        }
+    }
+
+    private void PlaceFlag()
+    {
+        Vector3 placePosition = transform.position;
+        placedFlag = Instantiate(flagPrefab, placePosition, Quaternion.identity, flagParent);
+        hasFlag = false;
+
+        // LineRendererを有効化
+        teleportLineRenderer.enabled = true;
+        pickupLineRenderer.enabled = true;
+    }
+
+    private void PickupFlag()
+    {
+        if (placedFlag != null)
+        {
+            Destroy(placedFlag); // 旗を削除
+            placedFlag = null;
+            hasFlag = true; // 旗を手持ちに戻す
+        }
+    }
+
+    private void TeleportToFlag()
+    {
+        if (placedFlag != null)
+        {
+            transform.position = placedFlag.transform.position; // 旗の位置にテレポート
         }
     }
 
@@ -68,8 +160,8 @@ public class ShotGun : MonoBehaviour
     {
         if (currentAmmo < maxAmmo)
         {
-            currentAmmo++; // 残弾数を1発増やす
-            UpdateAmmoDisplay(); // 残弾数表示を更新
+            currentAmmo++;
+            UpdateAmmoDisplay();
         }
     }
 
@@ -78,14 +170,30 @@ public class ShotGun : MonoBehaviour
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePos - transform.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        weaponTransform.rotation = Quaternion.Euler(0, 0, angle);
+
+
+
+        // 親オブジェクトのスケールを反転
+        if (angle > 90 || angle < -90) // 左を向く角度範囲
+        {
+            weaponTransform.parent.rotation = Quaternion.Euler(0, 180, 0); // 左向きのためX軸を反転
+                                                                       // 武器の向きを更新
+            weaponTransform.rotation = Quaternion.Euler(0, 180, 180 - angle);
+        }
+        else
+        {
+            weaponTransform.parent.rotation = Quaternion.Euler(0, 0, 0); // 左向きのためX軸を反転
+                                                                      // 武器の向きを更新
+            weaponTransform.rotation = Quaternion.Euler(0, 0, angle);
+        }
     }
+
 
     void ApplyRecoil()
     {
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePos - transform.position).normalized;
-        playerRb.AddForce(direction.normalized * recoilForce, ForceMode2D.Impulse); // ここはそのままの方向に力を加える
+        playerRb.AddForce(-direction.normalized * recoilForce, ForceMode2D.Impulse);
     }
 
     void PlayShotEffect()
@@ -108,7 +216,7 @@ public class ShotGun : MonoBehaviour
     {
         if (other.CompareTag("Ground"))
         {
-            isGrounded = true; // 地面に接触中
+            isGrounded = true;
         }
     }
 
@@ -116,7 +224,34 @@ public class ShotGun : MonoBehaviour
     {
         if (other.CompareTag("Ground"))
         {
-            isGrounded = false; // 地面から離れた
+            isGrounded = false;
+        }
+    }
+
+    // LineRendererを初期化
+    private void CreateLineRenderer(ref LineRenderer lineRenderer, Color color)
+    {
+        GameObject lineObj = new GameObject("LineRenderer");
+        lineRenderer = lineObj.AddComponent<LineRenderer>();
+        lineRenderer.positionCount = circleSegmentCount + 1;
+        lineRenderer.startWidth = 0.1f;
+        lineRenderer.endWidth = 0.1f;
+        lineRenderer.useWorldSpace = true;
+        lineRenderer.startColor = color;
+        lineRenderer.endColor = color;
+        lineRenderer.enabled = false; // デフォルトは無効化
+    }
+
+    // 円を描画
+    private void DrawCircle(LineRenderer lineRenderer, float radius, Vector3 center)
+    {
+        float angle = 0f;
+        for (int i = 0; i <= circleSegmentCount; i++)
+        {
+            float x = Mathf.Cos(Mathf.Deg2Rad * angle) * radius;
+            float y = Mathf.Sin(Mathf.Deg2Rad * angle) * radius;
+            lineRenderer.SetPosition(i, new Vector3(x + center.x, y + center.y, 0));
+            angle += (360f / circleSegmentCount);
         }
     }
 }
