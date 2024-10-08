@@ -8,28 +8,42 @@ public class ShotGun : MonoBehaviour
     public float shotCooldown = 0.5f;
     private float cooldownTimer = 0f;
     public ParticleSystem shotEffect;
-    public GameObject[] ammoDisplayObjects;
 
     public int maxAmmo = 5;
     private int currentAmmo;
+    public float stopReloadTime = 2f;
+    private float stopTimer = 0f;
+    public GameObject[] ammoDisplayObjects;
     public float reloadTime = 2f;
     private float reloadTimer = 0f;
     public bool isGrounded = false;
 
-    public float walkSpeed = 2f; // 歩き速度
-    public Animator animator; // アニメーターの参照
+    public GameObject flagPrefab; // 旗のプレハブ
+    private GameObject placedFlag; // 設置された旗
+    public Transform flagParent; // 旗を配置する親オブジェクト
+    public float teleportDistance = 10f; // テレポートする距離のしきい値
+    public float flagPickupRange = 2f; // 旗を回収する範囲
+    private bool hasFlag = true; // 手持ちに旗があるかどうか
+    public float holdTime = 1.5f; // 旗を回収するための長押し時間
+    private float holdTimer = 0f;
+
+    private LineRenderer teleportLineRenderer; // テレポート距離の表示用
+    private LineRenderer pickupLineRenderer; // 旗回収範囲の表示用
+    public int circleSegmentCount = 50; // 円を構成する頂点の数
 
     [Header("Movement Settings")]
     private float keyHoldTime = 0f;
     public float maxHoldDuration = 1f; // 長押しの最大時間
     public float movementForceMultiplier = 2f; // 長押しに応じた移動力の倍率
-
-
     void Start()
     {
         playerRb = GetComponent<Rigidbody2D>();
         currentAmmo = maxAmmo;
         UpdateAmmoDisplay();
+
+        // LineRendererを作成
+        CreateLineRenderer(ref teleportLineRenderer, Color.red);
+        CreateLineRenderer(ref pickupLineRenderer, Color.green);
     }
 
     void Update()
@@ -37,8 +51,9 @@ public class ShotGun : MonoBehaviour
         AimWeapon();
         cooldownTimer -= Time.deltaTime;
 
-        // リロードタイマーを更新
         float speed = playerRb.velocity.magnitude;
+
+        // リロードタイマーを更新
         if (isGrounded || speed <= 0.1f)
         {
             reloadTimer += Time.deltaTime;
@@ -63,7 +78,6 @@ public class ShotGun : MonoBehaviour
             cooldownTimer = shotCooldown;
         }
 
-<<<<<<< HEAD
         // 旗の設置、テレポート機能
         HandleFlagActions();
 
@@ -133,23 +147,72 @@ public class ShotGun : MonoBehaviour
                 }
             }
         }
-=======
-        HandleMovement(); // 移動処理を追加
->>>>>>> a60e37c603de3805e3e4718c5a9102400c58c952
     }
 
-    private void HandleMovement()
-    {
 
+    private void HandleFlagActions()
+    {
+        if (placedFlag != null)
+        {
+            float distanceToFlag = Vector2.Distance(transform.position, placedFlag.transform.position);
+
+            // 旗の範囲外で自動的にテレポート
+            if ((distanceToFlag > teleportDistance) || ((Input.GetKey(KeyCode.R) && !(distanceToFlag <= flagPickupRange))))
+            {
+                TeleportToFlag();
+            }
+
+            // 旗の近くでRを長押しすると旗を回収
+            if (distanceToFlag <= flagPickupRange && Input.GetKey(KeyCode.R))
+            {
+                holdTimer += Time.deltaTime;
+
+                if (holdTimer >= holdTime)
+                {
+                    PickupFlag();
+                    holdTimer = 0f;
+                }
+            }
+            else
+            {
+                holdTimer = 0f;
+            }
+        }
+
+        // 旗が手持ちにある場合、設置可能
+        if (isGrounded && hasFlag && Input.GetKeyDown(KeyCode.R) && placedFlag == null)
+        {
+            PlaceFlag();
+        }
     }
 
-    void ApplyRecoil()
+    private void PlaceFlag()
     {
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 direction = (mousePos - transform.position).normalized;
+        Vector3 placePosition = transform.position;
+        placedFlag = Instantiate(flagPrefab, placePosition, Quaternion.identity, flagParent);
+        hasFlag = false;
 
-        // 反動を与える際はX軸とY軸に力を加える。反動は力で加算
-        playerRb.AddForce(-direction * recoilForce, ForceMode2D.Impulse);
+        // LineRendererを有効化
+        teleportLineRenderer.enabled = true;
+        pickupLineRenderer.enabled = true;
+    }
+
+    private void PickupFlag()
+    {
+        if (placedFlag != null)
+        {
+            Destroy(placedFlag); // 旗を削除
+            placedFlag = null;
+            hasFlag = true; // 旗を手持ちに戻す
+        }
+    }
+
+    private void TeleportToFlag()
+    {
+        if (placedFlag != null)
+        {
+            transform.position = placedFlag.transform.position; // 旗の位置にテレポート
+        }
     }
 
     private void ReloadAmmo()
@@ -167,26 +230,29 @@ public class ShotGun : MonoBehaviour
         Vector2 direction = (mousePos - transform.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
+
+
         // 親オブジェクトのスケールを反転
         if (angle > 90 || angle < -90) // 左を向く角度範囲
         {
             weaponTransform.parent.rotation = Quaternion.Euler(0, 180, 0); // 左向きのためX軸を反転
-<<<<<<< HEAD
                                                                            // 武器の向きを更新
-=======
->>>>>>> a60e37c603de3805e3e4718c5a9102400c58c952
             weaponTransform.rotation = Quaternion.Euler(0, 180, 180 - angle);
         }
         else
         {
-<<<<<<< HEAD
             weaponTransform.parent.rotation = Quaternion.Euler(0, 0, 0); // 左向きのためX軸を反転
                                                                          // 武器の向きを更新
-=======
-            weaponTransform.parent.rotation = Quaternion.Euler(0, 0, 0); // 右向き
->>>>>>> a60e37c603de3805e3e4718c5a9102400c58c952
             weaponTransform.rotation = Quaternion.Euler(0, 0, angle);
         }
+    }
+
+
+    void ApplyRecoil()
+    {
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 direction = (mousePos - transform.position).normalized;
+        playerRb.AddForce(-direction.normalized * recoilForce, ForceMode2D.Impulse);
     }
 
     void PlayShotEffect()
@@ -220,7 +286,6 @@ public class ShotGun : MonoBehaviour
             isGrounded = false;
         }
     }
-<<<<<<< HEAD
 
     // LineRendererを初期化
     private void CreateLineRenderer(ref LineRenderer lineRenderer, Color color)
@@ -249,6 +314,3 @@ public class ShotGun : MonoBehaviour
         }
     }
 }
-=======
-}
->>>>>>> a60e37c603de3805e3e4718c5a9102400c58c952
