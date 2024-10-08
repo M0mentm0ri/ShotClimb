@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 93148635}
   - component: {fileID: 93148634}
+  - component: {fileID: 93148636}
   - component: {fileID: 93148633}
   - component: {fileID: 93148632}
   - component: {fileID: 93148631}
@@ -209,9 +210,6 @@ MonoBehaviour:
   bulletPrefab: {fileID: 187124957481615003, guid: 2b1f2ff1314a58a48aed1fa7dd3ef9bf, type: 3}
   bulletSpeed: 20
   mainCamera: {fileID: 1705494771}
-  lineRenderer: {fileID: 1262994828}
-  maxGrappleDistance: 10
-  pullSpeed: 5
 --- !u!212 &93148634
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -280,6 +278,27 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &93148636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93148630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebe33c0f98a25b54095fb351eec4b484, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponTransform: {fileID: 93148635}
+  recoilForce: 5
+  shotCooldown: 0.5
+  shotEffect: {fileID: 0}
+  maxAmmo: 5
+  stopReloadTime: 2
+  ammoDisplayObjects: []
+  reloadTime: 2
+  isGrounded: 0
 --- !u!1 &212960614
 GameObject:
   m_ObjectHideFlags: 0
