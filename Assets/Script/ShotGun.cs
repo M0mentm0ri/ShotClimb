@@ -149,15 +149,6 @@ public class ShotGun : MonoBehaviour
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePos - transform.position).normalized;
         playerRb.AddForce(-direction.normalized * recoilForce, ForceMode2D.Impulse);
-
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 1f);
-        float adjustedRecoilForce = recoilForce;
-
-        // 壁に近い場合、リコイルを強化
-        if (hit.collider != null && hit.distance <= 0.5f)
-        {
-            adjustedRecoilForce *= 1.6f;  // リコイル力を強化
-        }
     }
 
     void PlayShotEffect()
@@ -177,6 +168,14 @@ public class ShotGun : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Ground"))
+        {
+            isGrounded = true;
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
     {
         if (other.CompareTag("Ground"))
         {
