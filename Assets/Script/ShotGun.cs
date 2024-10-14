@@ -21,6 +21,7 @@ public class ShotGun : MonoBehaviour
     [SerializeField] private float keyHoldTime = 0f; // Inspectorで調整可能
     [SerializeField] private float maxHoldDuration = 1f; // Inspectorで調整可能
     [SerializeField] private float movementForceMultiplier = 2f; // Inspectorで調整可能
+    private float adjustedRecoilForce;
 
     void Start()
     {
@@ -61,59 +62,54 @@ public class ShotGun : MonoBehaviour
             cooldownTimer = shotCooldown;
         }
 
-        HandleMovement();
+       /* HandleMovement()*/;
     }
 
-    void HandleMovement()
-    {
-        Vector2 moveDirection = Vector2.zero;
+    //void HandleMovement()
+    //{
+    //    Vector2 moveDirection = Vector2.zero;
 
-        // 押されているキーに応じた移動方向を決定
-        if (Input.GetKey(KeyCode.A))
-        {
-            moveDirection = Vector2.left;
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            moveDirection = Vector2.right;
-        }
+    //    // 押されているキーに応じた移動方向を決定
+    //    if (Input.GetKey(KeyCode.A))
+    //    {
+    //        moveDirection = Vector2.left;
+    //    }
+    //    else if (Input.GetKey(KeyCode.D))
+    //    {
+    //        moveDirection = Vector2.right;
+    //    }
 
-        // 現在の速度を取得
-        float currentSpeed = playerRb.velocity.x;
+    //    if (isGrounded)
+    //    {
+    //        // 地上にいる場合の動き
+    //        if (moveDirection != Vector2.zero)
+    //        {
+    //            // 押されている方向に一定の速度で移動
+    //            playerRb.velocity = new Vector2(moveDirection.x * movementForceMultiplier, playerRb.velocity.y);
+    //        }
+    //        else
+    //        {
+    //            // 動かないときは速度をゼロにする
+    //            playerRb.velocity = new Vector2(0, playerRb.velocity.y);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        // 空中にいる場合
+    //        if (moveDirection != Vector2.zero)
+    //        {
+    //            // 空中でのふわっとした動き
+    //            if (playerRb.velocity.x < 5f && playerRb.velocity.x > -5f) // 横方向の速度を制限
+    //            {
+    //                playerRb.AddForce(moveDirection * movementForceMultiplier * 0.5f, ForceMode2D.Force); // 力を半分に
+    //            }
+    //        }
 
-        // 飛行中か地上にいるかを判断
-        if (isGrounded)
-        {
-            // 地上にいる場合の動き
-            if (moveDirection != Vector2.zero)
-            {
-                // 押されている方向に一定の速度で移動
-                playerRb.velocity = new Vector2(moveDirection.x * movementForceMultiplier, playerRb.velocity.y);
-            }
-            else
-            {
-                // 動かないときは速度をゼロにする
-                playerRb.velocity = new Vector2(0, playerRb.velocity.y);
-            }
-        }
-        else
-        {
-            // 飛行中の動き
-            if (moveDirection != Vector2.zero)
-            {
-                // 同じ方向のキーを押すと一定の速度で飛び続ける
-                if (moveDirection.x == Mathf.Sign(currentSpeed))
-                {
-                    playerRb.velocity = new Vector2(moveDirection.x * movementForceMultiplier, playerRb.velocity.y);
-                }
-                // 逆方向のキーを押すと、飛行距離を一定の速度で減少させる
-                else
-                {
-                    playerRb.velocity = new Vector2(moveDirection.x * movementForceMultiplier, playerRb.velocity.y);
-                }
-            }
-        }
-    }
+    //        // 空中で加速しないように抵抗を加える
+    //        playerRb.velocity = new Vector2(playerRb.velocity.x * 0.98f, playerRb.velocity.y); // 空中での減速
+    //    }
+    //}
+
 
     private void ReloadAmmo()
     {
@@ -149,8 +145,28 @@ public class ShotGun : MonoBehaviour
     {
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePos - transform.position).normalized;
-        playerRb.AddForce(-direction.normalized * recoilForce, ForceMode2D.Impulse);
+
+        // 水平方向の反動にも対応するように力を調整
+        float recoilForceX = adjustedRecoilForce * Mathf.Cos(Mathf.Atan2(direction.y, direction.x));
+        float recoilForceY = adjustedRecoilForce * Mathf.Sin(Mathf.Atan2(direction.y, direction.x));
+
+        // 正しい反動を与える
+        playerRb.AddForce(new Vector2(-recoilForceX, -recoilForceY), ForceMode2D.Impulse);
+
+        // 地面や壁との距離を測定
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 1f);
+
+        // リコイルを強化する条件
+        if (hit.collider != null && hit.distance <= 0.5f)
+        {
+            adjustedRecoilForce = recoilForce * 1.6f;  // 近い場合リコイル力を強化
+        }
+        else
+        {
+            adjustedRecoilForce = recoilForce;  // デフォルトのリコイル力
+        }
     }
+
 
     void PlayShotEffect()
     {
