@@ -4,22 +4,23 @@ public class ShotGun : MonoBehaviour
 {
     private Rigidbody2D playerRb;
     public Transform weaponTransform;
-    public float recoilForce = 5f;
-    public float shotCooldown = 0.5f;
+
+    [SerializeField] private float recoilForce = 5f; // Inspectorで調整可能
+    [SerializeField] private float shotCooldown = 0.5f; // Inspectorで調整可能
     private float cooldownTimer = 0f;
     public ParticleSystem shotEffect;
     public GameObject[] ammoDisplayObjects;
 
-    public int maxAmmo = 5;
+    [SerializeField] private int maxAmmo = 5; // Inspectorで調整可能
     private int currentAmmo;
-    public float reloadTime = 2f;
+    [SerializeField] private float reloadTime = 2f; // Inspectorで調整可能
     private float reloadTimer = 0f;
     public bool isGrounded = false;
 
     [Header("Movement Settings")]
-    private float keyHoldTime = 0f;
-    public float maxHoldDuration = 1f; // 長押しの最大時間
-    public float movementForceMultiplier = 2f;
+    [SerializeField] private float keyHoldTime = 0f; // Inspectorで調整可能
+    [SerializeField] private float maxHoldDuration = 1f; // Inspectorで調整可能
+    [SerializeField] private float movementForceMultiplier = 2f; // Inspectorで調整可能
 
     void Start()
     {
@@ -113,7 +114,6 @@ public class ShotGun : MonoBehaviour
             }
         }
     }
-
 
     private void ReloadAmmo()
     {
