@@ -1485,7 +1485,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 17
   m_Sprite: {fileID: 21300000, guid: 97cbaff07f984a44682d8923b09c531a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1791,7 +1791,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponTransform: {fileID: 690135498}
-  recoilForce: 40
+  recoilForce: 10
   shotCooldown: 0.5
   shotEffect: {fileID: 1799526288}
   ammoDisplayObjects:
@@ -1800,9 +1800,11 @@ MonoBehaviour:
   - {fileID: 402102433}
   maxAmmo: 3
   reloadTime: 0.6
+  playerRb: {fileID: 0}
+  groundForce: 5
+  airForce: 1
+  accelFactor: 10
   isGrounded: 0
-  maxHoldDuration: 1
-  movementForceMultiplier: 2
 --- !u!50 &907275841
 Rigidbody2D:
   serializedVersion: 4
@@ -1870,7 +1872,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 2.74, y: 2.71}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 0
@@ -2482,7 +2484,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: -59
   m_Sprite: {fileID: 21300000, guid: 5595b828234578e4fb7334bc380684bf, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

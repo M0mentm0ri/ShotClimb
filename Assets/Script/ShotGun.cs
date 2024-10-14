@@ -2,25 +2,28 @@ using UnityEngine;
 
 public class ShotGun : MonoBehaviour
 {
-    private Rigidbody2D playerRb;
-    public Transform weaponTransform;
+    //--- Weapon Settings ---
+    [Header("Weapon Settings")]
+    public Transform weaponTransform;                  // 武器のTransform
+    [SerializeField] private float recoilForce = 5f;    // 反動力 (Inspectorで調整可能)
+    [SerializeField] private float shotCooldown = 0.5f; // 発射クールダウン (Inspectorで調整可能)
+    private float cooldownTimer = 0f;                   // クールダウンのタイマー
+    public ParticleSystem shotEffect;                   // 発射エフェクト
+    public GameObject[] ammoDisplayObjects;             // 弾薬の表示用オブジェクト
 
-    [SerializeField] private float recoilForce = 5f; // Inspectorで調整可能
-    [SerializeField] private float shotCooldown = 0.5f; // Inspectorで調整可能
-    private float cooldownTimer = 0f;
-    public ParticleSystem shotEffect;
-    public GameObject[] ammoDisplayObjects;
+    [Header("Ammo Settings")]
+    [SerializeField] private int maxAmmo = 5;           // 最大弾薬数 (Inspectorで調整可能)
+    private int currentAmmo;                            // 現在の弾薬数
+    [SerializeField] private float reloadTime = 2f;     // リロード時間 (Inspectorで調整可能)
+    private float reloadTimer = 0f;                     // リロードタイマー
 
-    [SerializeField] private int maxAmmo = 5; // Inspectorで調整可能
-    private int currentAmmo;
-    [SerializeField] private float reloadTime = 2f; // Inspectorで調整可能
-    private float reloadTimer = 0f;
-    public bool isGrounded = false;
-
+    //--- Movement Settings ---
     [Header("Movement Settings")]
-    [SerializeField] private float keyHoldTime = 0f; // Inspectorで調整可能
-    [SerializeField] private float maxHoldDuration = 1f; // Inspectorで調整可能
-    [SerializeField] private float movementForceMultiplier = 2f; // Inspectorで調整可能
+    public Rigidbody2D playerRb;                        // プレイヤーのリジットボディ
+    [SerializeField] private float groundForce = 10f; // 地上での移動力
+    [SerializeField] private float airForce = 5f;    // 空中での移動力
+    [SerializeField] private float accelFactor = 1.5f; // 加速係数 (速度差に基づく調整)
+    public bool isGrounded = false;             // 地上にいるかどうかのフラグ
 
     void Start()
     {
@@ -66,54 +69,49 @@ public class ShotGun : MonoBehaviour
 
     void HandleMovement()
     {
-        Vector2 moveDirection = Vector2.zero;
+        // コントローラーまたはキーボードの入力を取得 (Horizontal軸は "A"、"D" およびコントローラーの左スティックに対応)
+        float moveInput = Input.GetAxis("Horizontal");
 
-        // 押されているキーに応じた移動方向を決定
-        if (Input.GetKey(KeyCode.A))
-        {
-            moveDirection = Vector2.left;
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            moveDirection = Vector2.right;
-        }
+        // 移動方向を決定（-1 左、0 停止、1 右）
+        Vector2 moveDirection = new Vector2(moveInput, 0);
 
         // 現在の速度を取得
         float currentSpeed = playerRb.velocity.x;
 
-        // 飛行中か地上にいるかを判断
+        // 地上にいるかどうかを確認
         if (isGrounded)
         {
-            // 地上にいる場合の動き
-            if (moveDirection != Vector2.zero)
-            {
-                // 押されている方向に一定の速度で移動
-                playerRb.velocity = new Vector2(moveDirection.x * movementForceMultiplier, playerRb.velocity.y);
-            }
-            else
-            {
-                // 動かないときは速度をゼロにする
-                playerRb.velocity = new Vector2(0, playerRb.velocity.y);
-            }
+            // 目標とする移動速度
+            float targetSpeed = moveDirection.x * groundForce;
+
+            // 現在の速度との差を求める
+            float speedDifference = targetSpeed - currentSpeed;
+
+            // 加える力を速度の差に基づいて調整（速度が遅いときは強く、速いときは弱く）
+            float forceToAdd = speedDifference * accelFactor;
+
+            // AddForceで速度を一定に保つ
+            playerRb.AddForce(new Vector2(forceToAdd, 0), ForceMode2D.Force);
         }
         else
         {
-            // 飛行中の動き
+            // 空中にいる場合はAddForceを使って移動を制御
             if (moveDirection != Vector2.zero)
             {
-                // 同じ方向のキーを押すと一定の速度で飛び続ける
+                // 進んでいる方向と同じ場合は力を加える
                 if (moveDirection.x == Mathf.Sign(currentSpeed))
                 {
-                    playerRb.velocity = new Vector2(moveDirection.x * movementForceMultiplier, playerRb.velocity.y);
+                    playerRb.AddForce(new Vector2(moveDirection.x * airForce, 0), ForceMode2D.Force);
                 }
-                // 逆方向のキーを押すと、飛行距離を一定の速度で減少させる
+                // 逆方向の場合も力を加えて、速度を減少させる
                 else
                 {
-                    playerRb.velocity = new Vector2(moveDirection.x * movementForceMultiplier, playerRb.velocity.y);
+                    playerRb.AddForce(new Vector2(moveDirection.x * airForce, 0), ForceMode2D.Force);
                 }
             }
         }
     }
+
 
     private void ReloadAmmo()
     {
@@ -147,6 +145,7 @@ public class ShotGun : MonoBehaviour
 
     void ApplyRecoil()
     {
+        playerRb.velocity = Vector2.zero;
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePos - transform.position).normalized;
         playerRb.AddForce(-direction.normalized * recoilForce, ForceMode2D.Impulse);
