@@ -9,6 +9,7 @@ public class ShotGun : MonoBehaviour
     [SerializeField] private float shotCooldown = 0.5f; // 発射クールダウン (Inspectorで調整可能)
     private float cooldownTimer = 0f;                   // クールダウンのタイマー
     public ParticleSystem shotEffect;                   // 発射エフェクト
+    public ParticleSystem powerEffect;                   // 発射エフェクト
     public GameObject[] ammoDisplayObjects;             // 弾薬の表示用オブジェクト
 
     [Header("Ammo Settings")]
@@ -174,11 +175,14 @@ public class ShotGun : MonoBehaviour
         float adjustedRecoilForce = recoilForce;
         if (hit.collider != null)
         {
+            powerEffect.Play();
+            adjustedRecoilForce *= 1.5f; // Groundタグの場合、反動を1.5倍に
+
             // 当たったオブジェクトのタグを確認
             if (hit.collider.CompareTag("Ground"))
             {
                 Debug.Log("Ground!");
-                adjustedRecoilForce *= 1.5f; // Groundタグの場合、反動を1.5倍に
+
             }
             else
             {
