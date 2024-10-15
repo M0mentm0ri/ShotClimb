@@ -153,23 +153,44 @@ public class ShotGun : MonoBehaviour
 
     void ApplyRecoil()
     {
+        // プレイヤーの速度をゼロにリセット
         playerRb.velocity = Vector2.zero;
+
+        // マウスの位置を取得し、ワールド座標に変換
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePos - transform.position).normalized;
 
-        // 地面との距離を計測
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, distanceThreshold);
+        // 射撃方向にオフセットを追加
+        Vector2 offset = direction * 2.5f; // ここでオフセットの長さを調整
+        Vector2 rayOrigin = (Vector2)transform.position + offset;
 
-        // 地面に近ければ反動を強くする
+        // 地面との距離を計測
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, direction, distanceThreshold);
+
+        // レイキャストを視覚的に表示
+        Debug.DrawRay(rayOrigin, direction * distanceThreshold, Color.red, 5f);
+
+        // 加える反動を調整
         float adjustedRecoilForce = recoilForce;
-        if (hit.collider != null && hit.distance <= distanceThreshold)
+        if (hit.collider != null)
         {
-            adjustedRecoilForce *= recoilMultiplier;
+            // 当たったオブジェクトのタグを確認
+            if (hit.collider.CompareTag("Ground"))
+            {
+                Debug.Log("Ground!");
+                adjustedRecoilForce *= 1.5f; // Groundタグの場合、反動を1.5倍に
+            }
+            else
+            {
+                Debug.Log($"その他のタグ: {hit.collider.tag}"); // hit.collider.tagでタグを取得
+            }
         }
 
         // 正しい方向に反動を加える
         playerRb.AddForce(-direction.normalized * adjustedRecoilForce, ForceMode2D.Impulse);
     }
+
+
 
     void PlayShotEffect()
     {
