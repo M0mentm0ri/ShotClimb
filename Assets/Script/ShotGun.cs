@@ -149,6 +149,10 @@ public class ShotGun : MonoBehaviour
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePos - transform.position).normalized;
         playerRb.AddForce(-direction.normalized * recoilForce, ForceMode2D.Impulse);
+<<<<<<< HEAD
+
+=======
+>>>>>>> 0ee53c589557f912673d9ae4713cd2bf00136e89
     }
 
     void PlayShotEffect()
