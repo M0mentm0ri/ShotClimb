@@ -25,6 +25,10 @@ public class ShotGun : MonoBehaviour
     [SerializeField] private float accelFactor = 1.5f; // 加速係数 (速度差に基づく調整)
     public bool isGrounded = false;             // 地上にいるかどうかのフラグ
 
+    [Header("Recoil Settings")]
+    [SerializeField] private float recoilMultiplier = 1.5f; // 地面に近い場合のリコイル倍率
+    [SerializeField] private float distanceThreshold = 0.5f; // 地面との距離の閾値
+
     void Start()
     {
         playerRb = GetComponent<Rigidbody2D>();
@@ -148,8 +152,19 @@ public class ShotGun : MonoBehaviour
         playerRb.velocity = Vector2.zero;
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePos - transform.position).normalized;
-        playerRb.AddForce(-direction.normalized * recoilForce, ForceMode2D.Impulse);
 
+        // 地面との距離を計測
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, distanceThreshold);
+
+        // 地面に近ければ反動を強くする
+        float adjustedRecoilForce = recoilForce;
+        if (hit.collider != null && hit.distance <= distanceThreshold)
+        {
+            adjustedRecoilForce *= recoilMultiplier;
+        }
+
+        // 正しい方向に反動を加える
+        playerRb.AddForce(-direction.normalized * adjustedRecoilForce, ForceMode2D.Impulse);
     }
 
     void PlayShotEffect()
