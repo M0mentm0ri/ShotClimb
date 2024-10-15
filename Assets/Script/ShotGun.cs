@@ -85,17 +85,21 @@ public class ShotGun : MonoBehaviour
         // 地上にいるかどうかを確認
         if (isGrounded)
         {
-            // 目標とする移動速度
-            float targetSpeed = moveDirection.x * groundForce;
+            // 入力がある場合のみ処理を行う
+            if (moveDirection.x != 0)
+            {
+                // 目標とする移動速度
+                float targetSpeed = moveDirection.x * groundForce;
 
-            // 現在の速度との差を求める
-            float speedDifference = targetSpeed - currentSpeed;
+                // 現在の速度との差を求める
+                float speedDifference = targetSpeed - currentSpeed;
 
-            // 加える力を速度の差に基づいて調整（速度が遅いときは強く、速いときは弱く）
-            float forceToAdd = speedDifference * accelFactor;
+                // 加える力を速度の差に基づいて調整（速度が遅いときは強く、速いときは弱く）
+                float forceToAdd = speedDifference * accelFactor;
 
-            // AddForceで速度を一定に保つ
-            playerRb.AddForce(new Vector2(forceToAdd, 0), ForceMode2D.Force);
+                // AddForceで速度を一定に保つ
+                playerRb.AddForce(new Vector2(forceToAdd, 0), ForceMode2D.Force);
+            }
         }
         else
         {
