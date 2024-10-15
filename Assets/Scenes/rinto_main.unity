@@ -1846,9 +1846,17 @@ MonoBehaviour:
   - {fileID: 2067701688}
   maxAmmo: 3
   reloadTime: 0.6
+<<<<<<< HEAD
+  playerRb: {fileID: 0}
+  groundForce: 5
+  airForce: 1
+  accelFactor: 5
+  isGrounded: 1
+=======
   isGrounded: 0
   maxHoldDuration: 1
   movementForceMultiplier: 2
+>>>>>>> 0ee53c589557f912673d9ae4713cd2bf00136e89
 --- !u!50 &907275841
 Rigidbody2D:
   serializedVersion: 4
