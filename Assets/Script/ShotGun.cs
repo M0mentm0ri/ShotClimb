@@ -39,7 +39,9 @@ public class ShotGun : MonoBehaviour
 
     void Start()
     {
-        if(shaker == null)
+        // オブジェクトをアクティブにする
+        flashObject.SetActive(false);
+        if (shaker == null)
         {
             shaker = GetComponent<Shaker>();
         }
