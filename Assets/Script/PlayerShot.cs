@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class PlayerShot : MonoBehaviour // クラス名をPlayerShotに変更
@@ -28,6 +29,8 @@ public class PlayerShot : MonoBehaviour // クラス名をPlayerShotに変更
 
     // 弾薬表示用のオブジェクト
     public GameObject[] ammoDisplayObjects; // 弾薬を表示するためのオブジェクト
+
+  
 
     void Start()
     {
@@ -142,5 +145,13 @@ public class PlayerShot : MonoBehaviour // クラス名をPlayerShotに変更
             // アイテムを削除
             Destroy(other.gameObject);
         }
+
+
+       
+
     }
+
+   
+
+
 }

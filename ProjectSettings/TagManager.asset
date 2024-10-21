@@ -8,6 +8,7 @@ TagManager:
   - Ammo
   - Needle
   - ShotGun
+  - ScoreTriggerTag
   layers:
   - Default
   - TransparentFX
