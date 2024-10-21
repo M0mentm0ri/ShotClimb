@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+
 
 public class ShotGun : MonoBehaviour
 {
@@ -9,8 +11,11 @@ public class ShotGun : MonoBehaviour
     [SerializeField] private float shotCooldown = 0.5f; // 発射クールダウン (Inspectorで調整可能)
     private float cooldownTimer = 0f;                   // クールダウンのタイマー
     public ParticleSystem shotEffect;                   // 発射エフェクト
-    public ParticleSystem powerEffect;                   // 発射エフェクト
+    public ParticleSystem powerEffect;                  // 発射エフェクト
     public GameObject[] ammoDisplayObjects;             // 弾薬の表示用オブジェクト
+                                                        // 撃つ瞬間にアクティブにするオブジェクト
+    public GameObject flashObject; // 例: 銃口のフラッシュ
+    public Shaker shaker;
 
     [Header("Ammo Settings")]
     [SerializeField] private int maxAmmo = 5;           // 最大弾薬数 (Inspectorで調整可能)
@@ -21,17 +26,28 @@ public class ShotGun : MonoBehaviour
     //--- Movement Settings ---
     [Header("Movement Settings")]
     public Rigidbody2D playerRb;                        // プレイヤーのリジットボディ
-    [SerializeField] private float groundForce = 10f; // 地上での移動力
-    [SerializeField] private float airForce = 5f;    // 空中での移動力
-    [SerializeField] private float accelFactor = 1.5f; // 加速係数 (速度差に基づく調整)
-    public bool isGrounded = false;             // 地上にいるかどうかのフラグ
+    [SerializeField] private float groundForce = 10f;   // 地上での移動力
+    [SerializeField] private float airForce = 5f;       // 空中での移動力
+    [SerializeField] private float accelFactor = 1.5f;  // 加速係数 (速度差に基づく調整)
+    public bool isGrounded = false;                     // 地上にいるかどうかのフラグ
 
     [Header("Recoil Settings")]
     [SerializeField] private float recoilMultiplier = 1.5f; // 地面に近い場合のリコイル倍率
     [SerializeField] private float distanceThreshold = 0.5f; // 地面との距離の閾値
 
+    public Respawn respawn;
+
     void Start()
     {
+        if(shaker == null)
+        {
+            shaker = GetComponent<Shaker>();
+        }
+        if (respawn == null)
+        {
+            respawn = GetComponent<Respawn>();
+        }
+
         playerRb = GetComponent<Rigidbody2D>();
         currentAmmo = maxAmmo;
         UpdateAmmoDisplay();
@@ -62,11 +78,14 @@ public class ShotGun : MonoBehaviour
         // 弾があるか確認して発射
         if (Input.GetMouseButtonDown(0) && cooldownTimer <= 0f && currentAmmo > 0)
         {
+
             ApplyRecoil();
             PlayShotEffect();
             currentAmmo--;
+            shaker.Shake();
             UpdateAmmoDisplay();
             cooldownTimer = shotCooldown;
+            StartCoroutine(FlashActiveObject());
         }
 
         HandleMovement();
@@ -74,45 +93,29 @@ public class ShotGun : MonoBehaviour
 
     void HandleMovement()
     {
-        // コントローラーまたはキーボードの入力を取得 (Horizontal軸は "A"、"D" およびコントローラーの左スティックに対応)
+        // コントローラーまたはキーボードの入力を取得
         float moveInput = Input.GetAxis("Horizontal");
-
-        // 移動方向を決定（-1 左、0 停止、1 右）
         Vector2 moveDirection = new Vector2(moveInput, 0);
-
-        // 現在の速度を取得
         float currentSpeed = playerRb.velocity.x;
 
-        // 地上にいるかどうかを確認
         if (isGrounded)
         {
-            // 入力がある場合のみ処理を行う
             if (moveDirection.x != 0)
             {
-                // 目標とする移動速度
                 float targetSpeed = moveDirection.x * groundForce;
-
-                // 現在の速度との差を求める
                 float speedDifference = targetSpeed - currentSpeed;
-
-                // 加える力を速度の差に基づいて調整（速度が遅いときは強く、速いときは弱く）
                 float forceToAdd = speedDifference * accelFactor;
-
-                // AddForceで速度を一定に保つ
                 playerRb.AddForce(new Vector2(forceToAdd, 0), ForceMode2D.Force);
             }
         }
         else
         {
-            // 空中にいる場合はAddForceを使って移動を制御
             if (moveDirection != Vector2.zero)
             {
-                // 進んでいる方向と同じ場合は力を加える
                 if (moveDirection.x == Mathf.Sign(currentSpeed))
                 {
                     playerRb.AddForce(new Vector2(moveDirection.x * airForce, 0), ForceMode2D.Force);
                 }
-                // 逆方向の場合も力を加えて、速度を減少させる
                 else
                 {
                     playerRb.AddForce(new Vector2(moveDirection.x * airForce, 0), ForceMode2D.Force);
@@ -121,6 +124,18 @@ public class ShotGun : MonoBehaviour
         }
     }
 
+    // 0.1秒間オブジェクトをアクティブにする
+    private IEnumerator FlashActiveObject()
+    {
+        // オブジェクトをアクティブにする
+        flashObject.SetActive(true);
+
+        // 0.1秒待機
+        yield return new WaitForSeconds(0.1f);
+
+        // オブジェクトを非アクティブにする
+        flashObject.SetActive(false);
+    }
 
     private void ReloadAmmo()
     {
@@ -137,64 +152,46 @@ public class ShotGun : MonoBehaviour
         Vector2 direction = (mousePos - transform.position).normalized;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-        // 親オブジェクトのスケールを反転
-        if (angle > 90 || angle < -90) // 左を向く角度範囲
+        if (angle > 90 || angle < -90)
         {
-            weaponTransform.parent.rotation = Quaternion.Euler(0, 180, 0); // 左向きのためX軸を反転
-            // 武器の向きを更新
+            weaponTransform.parent.rotation = Quaternion.Euler(0, 180, 0);
             weaponTransform.rotation = Quaternion.Euler(0, 180, 180 - angle);
         }
         else
         {
-            weaponTransform.parent.rotation = Quaternion.Euler(0, 0, 0); // 右向きのためX軸を反転
-            // 武器の向きを更新
+            weaponTransform.parent.rotation = Quaternion.Euler(0, 0, 0);
             weaponTransform.rotation = Quaternion.Euler(0, 0, angle);
         }
     }
 
     void ApplyRecoil()
     {
-        // プレイヤーの速度をゼロにリセット
         playerRb.velocity = Vector2.zero;
-
-        // マウスの位置を取得し、ワールド座標に変換
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePos - transform.position).normalized;
-
-        // 射撃方向にオフセットを追加
-        Vector2 offset = direction * 2.5f; // ここでオフセットの長さを調整
+        Vector2 offset = direction * 2.5f;
         Vector2 rayOrigin = (Vector2)transform.position + offset;
 
-        // 地面との距離を計測
         RaycastHit2D hit = Physics2D.Raycast(rayOrigin, direction, distanceThreshold);
-
-        // レイキャストを視覚的に表示
         Debug.DrawRay(rayOrigin, direction * distanceThreshold, Color.red, 5f);
 
-        // 加える反動を調整
         float adjustedRecoilForce = recoilForce;
         if (hit.collider != null)
         {
             powerEffect.Play();
-            adjustedRecoilForce *= 1.5f; // Groundタグの場合、反動を1.5倍に
-
-            // 当たったオブジェクトのタグを確認
+            adjustedRecoilForce *= 1.5f;
             if (hit.collider.CompareTag("Ground"))
             {
                 Debug.Log("Ground!");
-
             }
             else
             {
-                Debug.Log($"その他のタグ: {hit.collider.tag}"); // hit.collider.tagでタグを取得
+                Debug.Log($"その他のタグ: {hit.collider.tag}");
             }
         }
 
-        // 正しい方向に反動を加える
         playerRb.AddForce(-direction.normalized * adjustedRecoilForce, ForceMode2D.Impulse);
     }
-
-
 
     void PlayShotEffect()
     {
@@ -218,6 +215,23 @@ public class ShotGun : MonoBehaviour
         {
             isGrounded = true;
         }
+        else if (other.CompareTag("Ammo"))
+        {
+            // 弾薬を増加させ、表示を更新
+            if (currentAmmo < maxAmmo)
+            {
+                currentAmmo++;
+                UpdateAmmoDisplay();
+            }
+
+            // 衝突した弾薬オブジェクトを削除
+            Destroy(other.gameObject);
+        }
+        else if (other.CompareTag("Needle"))
+        {
+            respawn.RespawnPlayer();
+        }
+            
     }
 
     private void OnTriggerStay2D(Collider2D other)
