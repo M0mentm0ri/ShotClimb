@@ -16,6 +16,7 @@ public class ShotGun : MonoBehaviour
                                                         // 撃つ瞬間にアクティブにするオブジェクト
     public GameObject flashObject; // 例: 銃口のフラッシュ
     public Shaker shaker;
+    public ParticleSystem DamageEffect;
 
     [Header("Ammo Settings")]
     [SerializeField] private int maxAmmo = 5;           // 最大弾薬数 (Inspectorで調整可能)
@@ -30,6 +31,7 @@ public class ShotGun : MonoBehaviour
     [SerializeField] private float airForce = 5f;       // 空中での移動力
     [SerializeField] private float accelFactor = 1.5f;  // 加速係数 (速度差に基づく調整)
     public bool isGrounded = false;                     // 地上にいるかどうかのフラグ
+    private bool isDamage = false;
 
     [Header("Recoil Settings")]
     [SerializeField] private float recoilMultiplier = 1.5f; // 地面に近い場合のリコイル倍率
@@ -88,6 +90,7 @@ public class ShotGun : MonoBehaviour
             UpdateAmmoDisplay();
             cooldownTimer = shotCooldown;
             StartCoroutine(FlashActiveObject());
+
         }
 
         HandleMovement();
@@ -231,9 +234,29 @@ public class ShotGun : MonoBehaviour
         }
         else if (other.CompareTag("Needle"))
         {
-            respawn.RespawnPlayer();
+            if(!isDamage)
+            // 0.2秒後にプレイヤーをリスポーン
+            StartCoroutine(RespawnAfterDelay(0.2f));
         }
             
+    }
+
+    // プレイヤーを遅延後にリスポーンさせるコルーチン
+    private IEnumerator RespawnAfterDelay(float delay)
+    {
+        isDamage = true;
+
+        yield return new WaitForSeconds(delay);
+
+        DamageEffect.Play();
+
+        // 指定された時間待機
+        yield return new WaitForSeconds(delay);
+
+        // プレイヤーをリスポーン
+        respawn.RespawnPlayer();
+
+        isDamage = false;
     }
 
     private void OnTriggerStay2D(Collider2D other)
