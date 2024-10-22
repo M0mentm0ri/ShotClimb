@@ -1,10 +1,9 @@
 using System.Collections;
 using UnityEngine;
 
-
 public class ShotGun : MonoBehaviour
 {
-    //--- Weapon Settings ---
+    // --- Weapon Settings ---
     [Header("Weapon Settings")]
     public Transform weaponTransform;                  // 武器のTransform
     [SerializeField] private float recoilForce = 5f;    // 反動力 (Inspectorで調整可能)
@@ -13,7 +12,6 @@ public class ShotGun : MonoBehaviour
     public ParticleSystem shotEffect;                   // 発射エフェクト
     public ParticleSystem powerEffect;                  // 発射エフェクト
     public GameObject[] ammoDisplayObjects;             // 弾薬の表示用オブジェクト
-                                                        // 撃つ瞬間にアクティブにするオブジェクト
     public GameObject flashObject; // 例: 銃口のフラッシュ
     public Shaker shaker;
     public ParticleSystem DamageEffect;
@@ -24,7 +22,7 @@ public class ShotGun : MonoBehaviour
     [SerializeField] private float reloadTime = 2f;     // リロード時間 (Inspectorで調整可能)
     private float reloadTimer = 0f;                     // リロードタイマー
 
-    //--- Movement Settings ---
+    // --- Movement Settings ---
     [Header("Movement Settings")]
     public Rigidbody2D playerRb;                        // プレイヤーのリジットボディ
     [SerializeField] private float groundForce = 10f;   // 地上での移動力
@@ -38,6 +36,9 @@ public class ShotGun : MonoBehaviour
     [SerializeField] private float distanceThreshold = 0.5f; // 地面との距離の閾値
 
     public Respawn respawn;
+
+    // Animatorの参照を追加
+    public Animator animator;
 
     void Start()
     {
@@ -55,6 +56,12 @@ public class ShotGun : MonoBehaviour
         playerRb = GetComponent<Rigidbody2D>();
         currentAmmo = maxAmmo;
         UpdateAmmoDisplay();
+
+        if(animator == null)
+        {
+            // Animatorコンポーネントの取得
+            animator = GetComponent<Animator>();
+        }
     }
 
     void Update()
@@ -63,6 +70,9 @@ public class ShotGun : MonoBehaviour
         cooldownTimer -= Time.deltaTime;
 
         float speed = playerRb.velocity.magnitude;
+
+        // アニメーションの状態を更新
+        UpdateAnimationStates();
 
         // リロードタイマーを更新
         if (isGrounded || speed <= 0.1f)
@@ -82,7 +92,6 @@ public class ShotGun : MonoBehaviour
         // 弾があるか確認して発射
         if (Input.GetMouseButtonDown(0) && cooldownTimer <= 0f && currentAmmo > 0)
         {
-
             ApplyRecoil();
             PlayShotEffect();
             currentAmmo--;
@@ -90,7 +99,6 @@ public class ShotGun : MonoBehaviour
             UpdateAmmoDisplay();
             cooldownTimer = shotCooldown;
             StartCoroutine(FlashActiveObject());
-
         }
 
         HandleMovement();
@@ -234,16 +242,17 @@ public class ShotGun : MonoBehaviour
         }
         else if (other.CompareTag("Needle"))
         {
-            if(!isDamage)
-            // 0.2秒後にプレイヤーをリスポーン
-            StartCoroutine(RespawnAfterDelay(0.2f));
+            if (!isDamage)
+                // 0.2秒後にプレイヤーをリスポーン
+                StartCoroutine(RespawnAfterDelay(0.2f));
         }
-            
     }
 
     // プレイヤーを遅延後にリスポーンさせるコルーチン
     private IEnumerator RespawnAfterDelay(float delay)
     {
+        shaker.Shake();
+        playerRb.simulated = false;
         isDamage = true;
 
         yield return new WaitForSeconds(delay);
@@ -255,7 +264,7 @@ public class ShotGun : MonoBehaviour
 
         // プレイヤーをリスポーン
         respawn.RespawnPlayer();
-
+        playerRb.simulated = true;
         isDamage = false;
     }
 
@@ -273,5 +282,18 @@ public class ShotGun : MonoBehaviour
         {
             isGrounded = false;
         }
+    }
+
+    // アニメーションの状態を更新するメソッド
+    private void UpdateAnimationStates()
+    {
+        // 空中かどうかをチェック
+        bool isInAir = !isGrounded;
+        animator.SetBool("IsJump", isInAir);
+
+        // 歩行状態を設定
+        float moveInput = Input.GetAxis("Horizontal");
+        bool isWalking = Mathf.Abs(moveInput) > 0.1f;
+        animator.SetBool("IsWalk", isWalking);
     }
 }
