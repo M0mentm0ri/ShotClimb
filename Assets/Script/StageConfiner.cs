@@ -3,17 +3,14 @@ using Cinemachine;
 
 public class StageConfiner : MonoBehaviour
 {
-    // ステージのコリジョンを保持するCollider2D (PolygonCollider2D, BoxCollider2Dなど何でも利用可能)
-    public Collider2D stageConfiner;
+    // ステージのコリジョンを保持するPolygonCollider2D
+    public PolygonCollider2D stageConfiner;
 
     // Cinemachineのバーチャルカメラ
     public CinemachineVirtualCamera virtualCamera;
 
     // カメラのConfinerコンポーネント
     public CinemachineConfiner2D confiner;
-
-    // プレイヤーのリスポーンポイントとして使用するGameObject
-    public GameObject respawnPoint;
 
     private void Start()
     {
@@ -34,42 +31,23 @@ public class StageConfiner : MonoBehaviour
             // 接触したプレイヤーからリスポーンスクリプトを取得
             Respawn respawnScript = other.GetComponent<Respawn>();
 
-            if (respawnScript != null && respawnPoint != null)
+            if (respawnScript != null)
             {
-                // リスポーンポイントの位置をリスポーン位置に設定
-                Vector3 newRespawnPosition = respawnPoint.transform.position; // リスポーンポイントの位置
+                // 自身のオブジェクトの座標をリスポーン位置に設定
+                Vector3 newRespawnPosition = transform.position; // 自身のオブジェクトの座標
                 respawnScript.SetRespawnPosition(newRespawnPosition);
-                Debug.Log("リスポーン位置をリスポーンポイントに更新しました: " + newRespawnPosition);
-            }
-            else if (respawnPoint == null)
-            {
-                Debug.LogWarning("リスポーンポイントが設定されていません。");
+                Debug.Log("リスポーン位置を更新しました: " + newRespawnPosition);
             }
         }
     }
 
-    // コンテクストメニューで呼び出せるようにするメソッド
-    [ContextMenu("Update Camera Confiner")]
+
     private void UpdateCameraConfiner()
     {
         if (confiner != null && stageConfiner != null)
         {
             confiner.m_BoundingShape2D = stageConfiner; // ステージのコリジョンをカメラに設定
             Debug.Log("カメラのConfinerを更新しました: " + stageConfiner.name);
-        }
-    }
-
-    [ContextMenu("Set Default Respawn Point")]
-    private void SetDefaultRespawnPoint()
-    {
-        if (respawnPoint != null)
-        {
-            respawnPoint.transform.position = transform.position; // 自身の位置をリスポーンポイントに設定
-            Debug.Log("リスポーンポイントをデフォルト位置に設定しました: " + transform.position);
-        }
-        else
-        {
-            Debug.LogWarning("リスポーンポイントが設定されていません。");
         }
     }
 }

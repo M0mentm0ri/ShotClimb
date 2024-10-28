@@ -4,11 +4,11 @@ using UnityEngine.Events;
 
 public class Battery : MonoBehaviour
 {
-    // 壊れた状態の画像（常に表示）
-    public SpriteRenderer brokenImage;
-
-    // 接触時に表示されるノーマル画像
+    // 常に表示される画像（ノーマル状態）
     public SpriteRenderer normalImage;
+
+    // 当たった時に表示される画像（透明度を変える対象）
+    public SpriteRenderer activatedImage;
 
     // 切り替えにかかる時間
     public float switchBackTime = 3f;
@@ -40,8 +40,8 @@ public class Battery : MonoBehaviour
         // "ShotGun" タグのオブジェクトにぶつかった時
         if (other.CompareTag("ShotGun"))
         {
-            // ノーマル画像を一気に表示
-            SetSpriteAlpha(normalImage, 1f);
+            // 上の画像の透明度を1にして表示
+            SetSpriteAlpha(activatedImage, 1f);
 
             // パーティクル再生
             activationParticles?.Play();
@@ -72,15 +72,18 @@ public class Battery : MonoBehaviour
         startColor.a = alpha;
         lineRenderer.startColor = startColor;
         lineRenderer.endColor = startColor;
+        lineRenderer.endColor = startColor;
     }
 
-    // 一定時間後にノーマル画像を緩やかに5回点滅させてから元に戻す処理
+    // 一定時間後に上の画像を緩やかに5回点滅させてから元に戻す処理
     private IEnumerator ResetImageAfterDelay()
     {
         // 指定時間待機
         yield return new WaitForSeconds(switchBackTime);
 
-        // ノーマル画像とラインレンダラーを緩やかに5回点滅させる
+
+
+        // 画像とラインレンダラーを緩やかに5回点滅させる
         for (int i = 0; i < 4; i++)
         {
             // フェードアウト（透明度を0にする）
@@ -92,13 +95,12 @@ public class Battery : MonoBehaviour
 
         // パーティクル再生
         resetParticles?.Play();
-
         // UnityEventを実行
         onReset?.Invoke();
 
         // フェードアウト（透明度を0にする）
         yield return StartCoroutine(FadeTo(0f, Color.blue));
-        SetSpriteAlpha(normalImage, 0f);
+        SetSpriteAlpha(activatedImage, 0f);
         SetLineRendererAlpha(Color.blue, 1f);
     }
 
@@ -106,7 +108,7 @@ public class Battery : MonoBehaviour
     private IEnumerator FadeTo(float targetAlpha, Color targetColor)
     {
         // 現在のアルファ値と色を取得
-        float currentAlpha = normalImage.color.a;
+        float currentAlpha = activatedImage.color.a;
         Color currentLineColor = lineRenderer.startColor;
 
         // 色の変化を滑らかにするための補間
@@ -121,7 +123,7 @@ public class Battery : MonoBehaviour
 
             // アルファ値の変更
             currentAlpha = Mathf.MoveTowards(currentAlpha, targetAlpha, fadeSpeed * Time.deltaTime); // 時間を考慮してスムーズに変更
-            SetSpriteAlpha(normalImage, currentAlpha);
+            SetSpriteAlpha(activatedImage, currentAlpha);
 
             // 色の変更
             float t = Mathf.Clamp01(timeElapsed / duration); // 0から1の範囲に収める
