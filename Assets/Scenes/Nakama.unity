@@ -239,12 +239,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ef0a7efebbbd9a4d8eaa0b9b016735c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
+  weaponTransform: {fileID: 0}
   recoilForce: 10
-  shotgun: {fileID: 853725274}
-  bulletPrefab: {fileID: 0}
+  shotCooldown: 0.5
+  shotEffect: {fileID: 0}
   maxAmmo: 2
-  bulletDistance: 0.5
+  ammoDisplayObjects: []
 --- !u!58 &56011947
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -252,6 +252,10 @@ public class ShotGun : MonoBehaviour
     private IEnumerator RespawnAfterDelay(float delay)
     {
         shaker.Shake();
+        // プレイヤーの速度をゼロに設定し、慣性をリセット
+
+        playerRb.velocity = Vector2.zero;
+
         playerRb.simulated = false;
         isDamage = true;
 
