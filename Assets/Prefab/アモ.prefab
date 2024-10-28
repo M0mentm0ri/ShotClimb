@@ -4916,7 +4916,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9daaccc78dfbabe4b9aa80e3f17d1b2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objectPrefab: {fileID: 8388894040932632338, guid: 9ec05bc1139770c4ab118a4e9b8ddf30, type: 3}
+  objectPrefab: {fileID: 4732891829441620822, guid: 4f094b5cd2c08444f8818d35981d7aa9, type: 3}
   spawnPosition: {fileID: 6929054625450277758}
   respawnTime: 5
   destructionParticles: {fileID: 6929054624123193744}
