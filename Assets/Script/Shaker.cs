@@ -19,6 +19,7 @@ public class Shaker : MonoBehaviour
     }
 
     // シェイクを実行するメソッド
+    [ContextMenu("Shake")]
     public void Shake()
     {
         // インパルスを生成してカメラを揺らす
