@@ -32,8 +32,8 @@ public class ShotGun : MonoBehaviour
     private bool isDamage = false;
 
     [Header("Recoil Settings")]
+    public ShotGunTrigger shotGunTrigger;  // 判定用トリガーオブジェクトの参照
     [SerializeField] private float recoilMultiplier = 1.5f; // 地面に近い場合のリコイル倍率
-    [SerializeField] private float distanceThreshold = 0.5f; // 地面との距離の閾値
 
     public Respawn respawn;
 
@@ -42,6 +42,11 @@ public class ShotGun : MonoBehaviour
 
     void Start()
     {
+        // shotGunTriggerの参照を設定する
+        if (shotGunTrigger == null)
+        {
+            shotGunTrigger = GetComponentInChildren<ShotGunTrigger>();
+        }
         // オブジェクトをアクティブにする
         flashObject.SetActive(false);
         if (shaker == null)
@@ -92,8 +97,9 @@ public class ShotGun : MonoBehaviour
         // 弾があるか確認して発射
         if (Input.GetMouseButtonDown(0) && cooldownTimer <= 0f && currentAmmo > 0)
         {
-            ApplyRecoil();
+            
             PlayShotEffect();
+            ApplyRecoil();
             currentAmmo--;
             shaker.Shake();
             UpdateAmmoDisplay();
@@ -179,30 +185,23 @@ public class ShotGun : MonoBehaviour
 
     void ApplyRecoil()
     {
+        // 反動方向の計算
         playerRb.velocity = Vector2.zero;
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (mousePos - transform.position).normalized;
-        Vector2 offset = direction * 2.5f;
-        Vector2 rayOrigin = (Vector2)transform.position + offset;
-
-        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, direction, distanceThreshold);
-        Debug.DrawRay(rayOrigin, direction * distanceThreshold, Color.red, 5f);
 
         float adjustedRecoilForce = recoilForce;
-        if (hit.collider != null)
+
+        // 地面が近い場合、リコイル倍率を増やす
+        if (shotGunTrigger != null && shotGunTrigger.CheckGroundClose())
         {
-            powerEffect.Play();
-            adjustedRecoilForce *= 1.5f;
-            if (hit.collider.CompareTag("Ground"))
-            {
-                Debug.Log("Ground!");
-            }
-            else
-            {
-                Debug.Log($"その他のタグ: {hit.collider.tag}");
-            }
+            Debug.Log("Ground!");
+            // 地面が近いのでリコイル倍率を適用
+             powerEffect.Play();
+            adjustedRecoilForce *= recoilMultiplier;
         }
 
+        // 計算したリコイルの力を加える
         playerRb.AddForce(-direction.normalized * adjustedRecoilForce, ForceMode2D.Impulse);
     }
 

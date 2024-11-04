@@ -5536,6 +5536,89 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
+--- !u!1 &511199739
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 511199740}
+  - component: {fileID: 511199742}
+  - component: {fileID: 511199743}
+  - component: {fileID: 511199744}
+  m_Layer: 6
+  m_Name: shotcheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &511199740
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 511199739}
+  m_LocalRotation: {x: -0, y: 2.9103827e-11, z: 0.000000010057135, w: 1}
+  m_LocalPosition: {x: 5.459999, y: -1.75, z: 0.00268602}
+  m_LocalScale: {x: 6.6666684, y: 6.666666, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 690135498}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!50 &511199742
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 511199739}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!114 &511199743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 511199739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 782c2369dc9b9db4bab41cead25790c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!70 &511199744
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 511199739}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.2, y: 0}
+  m_Size: {x: 1.7, y: 0.77}
+  m_Direction: 1
 --- !u!1 &583909001
 GameObject:
   m_ObjectHideFlags: 0
@@ -5766,6 +5849,7 @@ Transform:
   m_LocalScale: {x: 0.15, y: 0.15, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 511199740}
   - {fileID: 1904100778}
   - {fileID: 1799526286}
   - {fileID: 1167899350}
@@ -6102,8 +6186,8 @@ MonoBehaviour:
   airForce: 1
   accelFactor: 2
   isGrounded: 0
+  shotGunTrigger: {fileID: 511199743}
   recoilMultiplier: 1.5
-  distanceThreshold: 1.01
   respawn: {fileID: 907275846}
   animator: {fileID: 1106470887}
 --- !u!50 &907275841
@@ -6850,7 +6934,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 690135498}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: -0.3, y: 1.291, z: -45.205}
 --- !u!199 &1167899351
 ParticleSystemRenderer:
@@ -7868,7 +7952,7 @@ ParticleSystem:
       countCurve:
         serializedVersion: 2
         minMaxState: 0
-        scalar: 10
+        scalar: 20
         minScalar: 30
         maxCurve:
           serializedVersion: 2
@@ -12179,7 +12263,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 690135498}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0.201, y: -0.311, z: -14.479}
 --- !u!199 &1799526287
 ParticleSystemRenderer:
@@ -17116,7 +17200,7 @@ GameObject:
   - component: {fileID: 1904100779}
   - component: {fileID: 1904100781}
   - component: {fileID: 1904100780}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Triangle
   m_TagString: ShotGun
   m_Icon: {fileID: 0}
@@ -17131,14 +17215,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1904100777}
   m_LocalRotation: {x: 0.0016051428, y: 0.00038363668, z: 0.71517247, w: 0.6989462}
-  m_LocalPosition: {x: 22, y: -0.3999976, z: 0}
+  m_LocalPosition: {x: 21.16, y: -1.32, z: 0}
   m_LocalScale: {x: 20.329195, y: 29.739983, z: 4.1213956}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 459990414}
   - {fileID: 1540034120}
   m_Father: {fileID: 690135498}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0.097, y: 0.162, z: 91.315}
 --- !u!212 &1904100779
 SpriteRenderer:
