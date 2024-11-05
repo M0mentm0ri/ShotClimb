@@ -9,6 +9,7 @@ TagManager:
   - Needle
   - ShotGun
   - ScoreTriggerTag
+  - SlowZone
   layers:
   - Default
   - TransparentFX
