@@ -310,7 +310,7 @@ public class ShotGun : MonoBehaviour
     {
         shaker.Shake();
         // プレイヤーの速度をゼロに設定し、慣性をリセット
-
+        onDamage.Invoke();
         respawnlight.SetActive(true);
         playerRb.velocity = Vector2.zero;
 
