@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class ShotGun : MonoBehaviour
 {
@@ -38,8 +39,18 @@ public class ShotGun : MonoBehaviour
 
     public Respawn respawn;
 
+    public UnityEvent onShot;
+    public UnityEvent onPowerShot;
+    public UnityEvent onReload;
+    public UnityEvent onWalkStart_SET;
+    public UnityEvent onWalkStart;
+    public UnityEvent onWalkStop;
+    public UnityEvent onDamage;
+    public UnityEvent onRespawn;
+    public UnityEvent onAmmo;
     // Animatorの参照を追加
     public Animator animator;
+    private bool one = false;
 
     void Start()
     {
@@ -112,6 +123,9 @@ public class ShotGun : MonoBehaviour
         HandleMovement();
     }
 
+    // 歩行状態を管理するための変数
+    bool isWalking = false;
+
     void HandleMovement()
     {
         // コントローラーまたはキーボードの入力を取得
@@ -119,18 +133,45 @@ public class ShotGun : MonoBehaviour
         Vector2 moveDirection = new Vector2(moveInput, 0);
         float currentSpeed = playerRb.velocity.x;
 
+        // 地面にいる場合の処理
         if (isGrounded)
         {
+            // 入力がある場合にのみ移動
             if (moveDirection.x != 0)
             {
                 float targetSpeed = moveDirection.x * groundForce;
                 float speedDifference = targetSpeed - currentSpeed;
                 float forceToAdd = speedDifference * accelFactor;
                 playerRb.AddForce(new Vector2(forceToAdd, 0), ForceMode2D.Force);
+
+                // 歩き始めた瞬間を検知してonWalkStartを呼び出し
+                if (!isWalking)
+                {
+                    isWalking = true;
+                    if (!one)
+                    {
+                        onWalkStart_SET.Invoke();
+                        one = true;
+                    }
+                    else
+                    {
+                        onWalkStart.Invoke(); // 歩き始めイベントを発火
+                    }
+                }
+            }
+            else
+            {
+                // 入力がゼロでかつ現在歩行中だった場合、停止を検知してonWalkStopを呼び出し
+                if (isWalking)
+                {
+                    isWalking = false;
+                    onWalkStop.Invoke(); // 止まったイベントを発火
+                }
             }
         }
         else
         {
+            // 空中にいる場合の処理
             if (moveDirection != Vector2.zero)
             {
                 if (moveDirection.x == Mathf.Sign(currentSpeed))
@@ -142,12 +183,21 @@ public class ShotGun : MonoBehaviour
                     playerRb.AddForce(new Vector2(moveDirection.x * airForce, 0), ForceMode2D.Force);
                 }
             }
+
+            // 空中にいる間は歩行状態をリセット
+            if (isWalking)
+            {
+                isWalking = false;
+                onWalkStop.Invoke(); // 止まったイベントを発火（ジャンプなどで空中に行った場合）
+            }
         }
     }
+
 
     // 0.1秒間オブジェクトをアクティブにする
     private IEnumerator FlashActiveObject()
     {
+        
         // オブジェクトをアクティブにする
         flashObject.SetActive(true);
 
@@ -162,6 +212,7 @@ public class ShotGun : MonoBehaviour
     {
         if (currentAmmo < maxAmmo)
         {
+            onReload.Invoke();
             currentAmmo++;
             UpdateAmmoDisplay();
         }
@@ -201,8 +252,12 @@ public class ShotGun : MonoBehaviour
             // 地面が近いのでリコイル倍率を適用
              powerEffect.Play();
             adjustedRecoilForce *= recoilMultiplier;
+            onPowerShot.Invoke();
         }
-
+        else
+        {
+            onShot.Invoke();
+        }
         // 計算したリコイルの力を加える
         playerRb.AddForce(-direction.normalized * adjustedRecoilForce, ForceMode2D.Impulse);
     }
@@ -234,6 +289,7 @@ public class ShotGun : MonoBehaviour
             // 弾薬を増加させ、表示を更新
             if (currentAmmo < maxAmmo)
             {
+                onAmmo.Invoke();
                 currentAmmo++;
                 UpdateAmmoDisplay();
             }
@@ -270,6 +326,7 @@ public class ShotGun : MonoBehaviour
 
         respawnlight.SetActive(false);
         // プレイヤーをリスポーン
+        onRespawn.Invoke();
         respawn.RespawnPlayer();
         playerRb.simulated = true;
         isDamage = false;
@@ -280,6 +337,7 @@ public class ShotGun : MonoBehaviour
         if (other.CompareTag("Ground"))
         {
             isGrounded = true;
+            
         }
     }
 
