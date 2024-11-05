@@ -12,6 +12,7 @@ public class Battery : MonoBehaviour
     public ParticleSystem activationParticles;
     public ParticleSystem resetParticles;
     public UnityEvent onActivate;
+    public UnityEvent onAlert;
     public UnityEvent onReset;
     public LineRenderer lineRenderer;
 
@@ -60,6 +61,7 @@ public class Battery : MonoBehaviour
         for (int i = 0; i < 4; i++)
         {
             yield return StartCoroutine(FadeTo(1f, Color.red));
+            onAlert.Invoke();
             yield return StartCoroutine(FadeTo(0f, Color.blue));
         }
 
