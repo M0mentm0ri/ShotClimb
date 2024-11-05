@@ -410,6 +410,7 @@ MonoBehaviour:
   isGrounded: 0
   shotGunTrigger: {fileID: 9079781204971759208}
   recoilMultiplier: 1.5
+  respawnlight: {fileID: 9079781204355346452}
   respawn: {fileID: 9079781204575093201}
   animator: {fileID: 9079781206019999856}
 --- !u!114 &9079781204575093201

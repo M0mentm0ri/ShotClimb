@@ -34,6 +34,7 @@ public class ShotGun : MonoBehaviour
     [Header("Recoil Settings")]
     public ShotGunTrigger shotGunTrigger;  // 判定用トリガーオブジェクトの参照
     [SerializeField] private float recoilMultiplier = 1.5f; // 地面に近い場合のリコイル倍率
+    public GameObject respawnlight;
 
     public Respawn respawn;
 
@@ -42,6 +43,7 @@ public class ShotGun : MonoBehaviour
 
     void Start()
     {
+        respawnlight.SetActive(false);
         // shotGunTriggerの参照を設定する
         if (shotGunTrigger == null)
         {
@@ -253,6 +255,7 @@ public class ShotGun : MonoBehaviour
         shaker.Shake();
         // プレイヤーの速度をゼロに設定し、慣性をリセット
 
+        respawnlight.SetActive(true);
         playerRb.velocity = Vector2.zero;
 
         playerRb.simulated = false;
@@ -265,6 +268,7 @@ public class ShotGun : MonoBehaviour
         // 指定された時間待機
         yield return new WaitForSeconds(delay);
 
+        respawnlight.SetActive(false);
         // プレイヤーをリスポーン
         respawn.RespawnPlayer();
         playerRb.simulated = true;

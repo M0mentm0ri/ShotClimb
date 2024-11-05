@@ -6736,6 +6736,11 @@ Transform:
   m_Father: {fileID: 721473186}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1967176270 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 9079781204355346452, guid: 12ed505a78b01044b97fcecfcedb4a4e, type: 3}
+  m_PrefabInstance: {fileID: 7956699557351492426}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2082266093
 GameObject:
   m_ObjectHideFlags: 0
@@ -7439,6 +7444,30 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 9079781204355346450, guid: 12ed505a78b01044b97fcecfcedb4a4e, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9079781204355346450, guid: 12ed505a78b01044b97fcecfcedb4a4e, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9079781204355346450, guid: 12ed505a78b01044b97fcecfcedb4a4e, type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 9079781204355346450, guid: 12ed505a78b01044b97fcecfcedb4a4e, type: 3}
+      propertyPath: m_Intensity
+      value: 57.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9079781204355346450, guid: 12ed505a78b01044b97fcecfcedb4a4e, type: 3}
+      propertyPath: m_FalloffIntensity
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 9079781204355346452, guid: 12ed505a78b01044b97fcecfcedb4a4e, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 9079781204575093203, guid: 12ed505a78b01044b97fcecfcedb4a4e, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -7447,6 +7476,10 @@ PrefabInstance:
       propertyPath: shaker
       value: 
       objectReference: {fileID: 1125089947}
+    - target: {fileID: 9079781204575093207, guid: 12ed505a78b01044b97fcecfcedb4a4e, type: 3}
+      propertyPath: respawnlight
+      value: 
+      objectReference: {fileID: 1967176270}
     - target: {fileID: 9079781204575093207, guid: 12ed505a78b01044b97fcecfcedb4a4e, type: 3}
       propertyPath: ammoDisplayObjects.Array.data[0]
       value: 
