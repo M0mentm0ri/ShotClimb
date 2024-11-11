@@ -7238,6 +7238,7 @@ GameObject:
   - component: {fileID: 1546618216}
   - component: {fileID: 1546618218}
   - component: {fileID: 1546618217}
+  - component: {fileID: 1546618219}
   m_Layer: 5
   m_Name: Text (TMP)
   m_TagString: Untagged
@@ -7262,7 +7263,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -821, y: -414}
+  m_AnchoredPosition: {x: -826, y: -433}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1546618217
@@ -7285,10 +7286,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 1
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b1b48bbbb46d2a044a50eb6f22b76c21, type: 2}
-  m_sharedMaterial: {fileID: -7503724322430210910, guid: b1b48bbbb46d2a044a50eb6f22b76c21, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 74ca559a1288e5f4d9bb5e83c3af3ba1, type: 2}
+  m_sharedMaterial: {fileID: 9028803693386255216, guid: 74ca559a1288e5f4d9bb5e83c3af3ba1, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7312,8 +7313,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 111.78
-  m_fontSizeBase: 111.78
+  m_fontSize: 80.14
+  m_fontSizeBase: 80.14
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -7348,7 +7349,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: -423.22595, w: 0}
+  m_margin: {x: 0, y: 0, z: -423.22595, w: -56.73993}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -7362,6 +7363,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1546618215}
   m_CullTransparentMesh: 1
+--- !u!114 &1546618219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1546618215}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfb740c04dcbf4645881f60af5407564, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timerText: {fileID: 1546618217}
+  bestTimeTexts:
+  - {fileID: 0}
 --- !u!4 &1653411186 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5302364468274285197, guid: c6b46ec1c7912194985e496adfcd4171, type: 3}

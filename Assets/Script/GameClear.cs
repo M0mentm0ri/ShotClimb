@@ -12,6 +12,7 @@ public class GameClear : MonoBehaviour
     private void Start()
     {
         StartCoroutine(FadeOutAndLoadScene()); // シーン開始時にフェードアウトとシーンのロードを開始
+        Time.timeScale = 1.0f;
     }
 
     private IEnumerator FadeOutAndLoadScene()
