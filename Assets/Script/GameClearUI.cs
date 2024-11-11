@@ -10,7 +10,7 @@ public class GameClearUI : MonoBehaviour
     private void Start()
     {
         // ステージごとのタイムを表示
-        for (int i = 0; i < 8; i++)  // 10ステージ分ループ
+        for (int i = 0; i < 9; i++)  // 10ステージ分ループ
         {
             if (i < stageTimesText.Length)  // 配列の範囲内であることを確認
             {
