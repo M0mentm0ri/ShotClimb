@@ -10,6 +10,7 @@ TagManager:
   - ShotGun
   - ScoreTriggerTag
   - SlowZone
+  - GameClear
   layers:
   - Default
   - TransparentFX

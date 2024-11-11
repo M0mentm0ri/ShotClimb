@@ -322,6 +322,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9079781204575093203}
+  - component: {fileID: 2596303122328288015}
   - component: {fileID: 9079781204575093206}
   - component: {fileID: 9079781204575093207}
   - component: {fileID: 9079781204575093201}
@@ -356,6 +357,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2596303122328288015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9079781204575093160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce616e17a8874a7409a2be4a42530123, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameClearTag: GameClear
+  whiteOutPanel: {fileID: 0}
+  fadeSpeed: 2
+  gameClearScene: GameClear1
 --- !u!50 &9079781204575093206
 Rigidbody2D:
   serializedVersion: 4
@@ -412,6 +429,33 @@ MonoBehaviour:
   recoilMultiplier: 1.5
   respawnlight: {fileID: 9079781204355346452}
   respawn: {fileID: 9079781204575093201}
+  onShot:
+    m_PersistentCalls:
+      m_Calls: []
+  onPowerShot:
+    m_PersistentCalls:
+      m_Calls: []
+  onReload:
+    m_PersistentCalls:
+      m_Calls: []
+  onWalkStart_SET:
+    m_PersistentCalls:
+      m_Calls: []
+  onWalkStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onWalkStop:
+    m_PersistentCalls:
+      m_Calls: []
+  onDamage:
+    m_PersistentCalls:
+      m_Calls: []
+  onRespawn:
+    m_PersistentCalls:
+      m_Calls: []
+  onAmmo:
+    m_PersistentCalls:
+      m_Calls: []
   animator: {fileID: 9079781206019999856}
 --- !u!114 &9079781204575093201
 MonoBehaviour:
