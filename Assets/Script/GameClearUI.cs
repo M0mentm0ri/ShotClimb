@@ -16,12 +16,12 @@ public class GameClearUI : MonoBehaviour
             {
                 // PlayerPrefsから "Stage1", "Stage2", ... のタイムを取得
                 float stageTime = PlayerPrefs.GetFloat("Stage" + (i + 1), 0f);  // "Stage1"〜"Stage10" のタイムを取得
-                stageTimesText[i].text = "Stage " + (i + 1) + " Time: " + Mathf.FloorToInt(stageTime) + "s";  // 秒単位で表示
+                stageTimesText[i].text = (i + 1) + "階" + " " + stageTime.ToString("F1") + "秒";  // 秒単位で表示
             }
         }
 
         // 合計タイムを表示
         float totalTime = PlayerPrefs.GetFloat("TotalTime", 0f);  // "TotalTime" の合計タイムを取得
-        totalTimeText.text = "Total Time: " + Mathf.FloorToInt(totalTime) + "s";  // 合計タイムを表示
+        totalTimeText.text = "登頂時間:" + totalTime.ToString("F1") + "秒";  // 合計タイムを表示
     }
 }

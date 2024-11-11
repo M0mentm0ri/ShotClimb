@@ -29,7 +29,7 @@ public class TimerManager : MonoBehaviour
             totalTime += Time.deltaTime;
 
             // タイマーを表示
-            timerText.text = Mathf.Floor(stageTime).ToString() + "s";
+            timerText.text = stageTime.ToString("F1") + "s";
         }
     }
 
@@ -68,7 +68,7 @@ public class TimerManager : MonoBehaviour
         PlayerPrefs.SetFloat("TotalTime", totalTime);
 
         // ステージごとの時間を表示
-        Debug.Log("Stage " + stageTimes.Count + ": " + Mathf.Floor(stageTime) + "s");
+        Debug.Log("Stage " + stageTimes.Count + ": " + stageTime.ToString("F1") + "s");
     }
 
     private IEnumerator ChangeTimerColor()
