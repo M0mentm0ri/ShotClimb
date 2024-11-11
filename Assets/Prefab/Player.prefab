@@ -322,6 +322,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9079781204575093203}
+  - component: {fileID: 2046635469809733089}
   - component: {fileID: 2596303122328288015}
   - component: {fileID: 9079781204575093206}
   - component: {fileID: 9079781204575093207}
@@ -357,6 +358,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2046635469809733089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9079781204575093160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d10e2a35c17a7447baee2107b427fb8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timerText: {fileID: 0}
+  timerManager: {fileID: 0}
 --- !u!114 &2596303122328288015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -369,7 +384,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce616e17a8874a7409a2be4a42530123, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameClearTag: GameClear
+  playerTag: Player
   whiteOutPanel: {fileID: 0}
   fadeSpeed: 2
   gameClearScene: GameClear1

@@ -11,6 +11,17 @@ TagManager:
   - ScoreTriggerTag
   - SlowZone
   - GameClear
+  - timerTag1
+  - timerTag2
+  - timerTag3
+  - timerTag4
+  - timerTag5
+  - timerTag6
+  - timerTag7
+  - timerTag8
+  - timerTag9
+  - timerTag10
+  - timerTag
   layers:
   - Default
   - TransparentFX
