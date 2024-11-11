@@ -44,6 +44,6 @@ public class FadeSceneLoader : MonoBehaviour
         }
 
         fadePanel.color = endColor;  // フェードが完了したら最終色に設定
-        SceneManager.LoadScene("Masato"); // シーンをロードしてメニューシーンに遷移
+        SceneManager.LoadScene("Rinto2"); // シーンをロードしてメニューシーンに遷移
     }
 }
