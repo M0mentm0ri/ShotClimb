@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class PlayerCollision : MonoBehaviour
 {
     public TextMeshProUGUI timerText;  // タイマーを表示するTextMeshProのUI
+    public TextMeshProUGUI checkpointText;        // チェックポイント到達メッセージ用のTextMeshProUI
     public TimerManager timerManager;  // TimerManagerの参照（Inspectorから割り当て）
 
     private Color originalColor;  // 元のタイマー色を保存
@@ -49,8 +50,10 @@ public class PlayerCollision : MonoBehaviour
     private IEnumerator ChangeTimerColor()
     {
         // タイマーを赤く変更
+        checkpointText.gameObject.SetActive(true);
         timerText.color = Color.red;
         yield return new WaitForSeconds(1f);  // 1秒間赤いまま
         timerText.color = originalColor;  // 元の色に戻す
+        checkpointText.gameObject.SetActive(false);
     }
 }
