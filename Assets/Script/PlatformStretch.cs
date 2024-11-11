@@ -14,6 +14,7 @@ public class PlatformStretch : MonoBehaviour
     public float stretchAmount = 2.0f;  // 伸ばす長さ
     public float stretchSpeed = 1.0f;   // 伸ばす速度
     public float resetSpeed = 1.0f;     // 元に戻る速度
+    public GameObject followPlatform;   // 壁に追従させる足場オブジェクト
 
     private SpriteRenderer spriteRenderer;
     private Vector2 originalSize;       // 元のスプライトサイズ
@@ -107,18 +108,34 @@ public class PlatformStretch : MonoBehaviour
     {
         float stretchChange = spriteRenderer.size.x - originalSize.x;  // 伸ばしの変化量
 
+        // 壁の位置更新
         if (direction == StretchDirection.Left)
         {
-            // 右方向に伸ばす場合は右に移動
             transform.position = originalPosition - Vector3.right * (stretchChange / 2);
         }
-        else if (direction == StretchDirection.Right) 
+        else if (direction == StretchDirection.Right)
         {
-            // 左方向に伸ばす場合は左に移動
             transform.position = originalPosition + Vector3.right * (stretchChange / 2);
         }
-    }
 
+        // 足場オブジェクトの位置を壁の端に追従させる
+        if (followPlatform != null)
+        {
+            Vector3 platformPosition = transform.position;
+
+            // 追従する方向によって足場の位置を壁の端に設定
+            if (direction == StretchDirection.Left)
+            {
+                platformPosition -= Vector3.right * (spriteRenderer.size.x / 2);
+            }
+            else if (direction == StretchDirection.Right)
+            {
+                platformPosition += Vector3.right * (spriteRenderer.size.x / 2);
+            }
+
+            followPlatform.transform.position = platformPosition;
+        }
+    }
 
     // 伸ばす方向に基づいて目標サイズと位置を設定
     private void SetTargetSizeAndPosition()
