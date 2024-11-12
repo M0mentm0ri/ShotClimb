@@ -8,7 +8,7 @@ public class TimerManager : MonoBehaviour
     public TextMeshProUGUI timerText;  // タイマーを表示するTextMeshProのUI
     public string timerTag = "timerTag";  // 衝突判定用のタグ
     public float stageTime = 0f;  // 現在のステージの経過時間
-    public static float totalTime = 0f;  // ゲーム全体の合計時間
+    public float totalTime = 0f;  // ゲーム全体の合計時間
     private bool isColliding = false;
     private Color originalColor;
 
