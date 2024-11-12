@@ -19,18 +19,19 @@ public class Battery : MonoBehaviour
     // コルーチンの参照を保持する変数
     private Coroutine resetCoroutine;
 
-    private void OnTriggerStay2D(Collider2D other)
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("ShotGun"))
         {
             SetSpriteAlpha(activatedImage, 0f);
-            activationParticles?.Play();
-            onActivate?.Invoke();
+            activationParticles?.Play();           
             SetLineRendererAlpha(Color.red, 1f);
+            onActivate?.Invoke();
 
             // 既存のコルーチンが実行中なら停止してリセット
             if (resetCoroutine != null)
             {
+                
                 StopCoroutine(resetCoroutine);
             }
             // 新しいコルーチンを開始し、参照を保存
